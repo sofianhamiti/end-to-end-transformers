@@ -1,0 +1,1 @@
+Launch CloudFormation stack in eu-west-1: [![button](media/cloudformation-launch-stack.png)](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/create/review?stackName=mlops-stack&templateURL=https://aws-mlops-workshop.s3-eu-west-1.amazonaws.com/reviews/stack/product.template.yaml)

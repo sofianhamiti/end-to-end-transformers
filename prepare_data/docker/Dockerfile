@@ -16,4 +16,4 @@ RUN pip3 install -r /tmp/requirements.txt --no-cache --upgrade
 
 COPY code /opt/program
 
-ENTRYPOINT ["python3", "/opt/program/download_glue_data.py"]
+ENTRYPOINT ["python3", "/opt/program/prepare_data.py"]
