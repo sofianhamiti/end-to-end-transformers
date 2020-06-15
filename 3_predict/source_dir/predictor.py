@@ -4,7 +4,6 @@ from torch import nn
 from transformers import BertModel, BertTokenizer
 
 JSON_CONTENT_TYPE = 'application/json'
-DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
 CLASS_NAMES = ['negative', 'neutral', 'positive']
 
@@ -26,8 +25,7 @@ class SentimentClassifier(nn.Module):
 def model_fn(model_dir):
     model_path = f'{model_dir}/best_model.bin'
     model = SentimentClassifier(len(CLASS_NAMES))
-    model.load_state_dict(torch.load(model_path))
-    model = model.to(DEVICE)
+    model.load_state_dict(torch.load(model_path, map_location='cpu'))
     return model
 
 # Perform prediction on the deserialized object, with the loaded model
@@ -46,12 +44,12 @@ def predict_fn(input_data, model):
       return_attention_mask=True,
       return_tensors='pt',
     )
-    input_ids = encoded_review['input_ids'].to(DEVICE)
-    attention_mask = encoded_review['attention_mask'].to(DEVICE)
+    input_ids = encoded_review['input_ids']
+    attention_mask = encoded_review['attention_mask']
 
     output = model(input_ids, attention_mask)
     _, prediction = torch.max(output, dim=1)
-    return prediction
+    return CLASS_NAMES[prediction]
 
 
 def input_fn(serialized_input_data, content_type=JSON_CONTENT_TYPE):  
