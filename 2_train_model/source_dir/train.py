@@ -55,7 +55,6 @@ if __name__ == "__main__":
     # CREATE DATA LOADERS
     train_data_loader, df_train = create_data_loader(train_path, tokenizer, max_len, batch_size)
     val_data_loader, df_val = create_data_loader(validation_path, tokenizer, max_len, batch_size)
-    test_data_loader, df_test = create_data_loader(test_path, tokenizer, max_len, batch_size)
     
     # INSTANTIATE MODEL
     model = SentimentClassifier(len(class_names), model_name)
