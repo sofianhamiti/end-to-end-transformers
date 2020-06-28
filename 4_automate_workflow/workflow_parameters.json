@@ -1,0 +1,41 @@
+{
+  "project": {
+    "name": "bert"
+  },
+  "data": {
+    "s3_bucket": "<<<replace-with-your-bucket-id>>>",
+    "initial_s3_data": "s3://aws-mlops-workshop/reviews/workshop_data/reviews.csv"
+  },
+  "processing": {
+    "container": "<<<replace-with-your-container-id>>>",
+    "instance_type": "ml.m5.xlarge",
+    "instance_count": 1,
+    "local_input_dir": "/opt/ml/processing/input",
+    "local_output_dir": "/opt/ml/processing/output"
+  },
+  "training": {
+    "container": "763104351884.dkr.ecr.eu-west-1.amazonaws.com/pytorch-training:1.5.0-gpu-py3",
+    "instance_type": "ml.p3.2xlarge",
+    "instance_count": 1,
+    "hyperparameters": {
+      "model_name":"bert-base-cased",
+      "data_folder": "/opt/ml/input/data/train",
+      "output_folder": "/opt/ml/model",
+      "epochs": "1",
+      "learning_rate": "2e-5",
+      "batch_size": "64",
+      "seed": "42",
+      "max_len": "160",
+      "sagemaker_container_log_level": "20",
+      "sagemaker_enable_cloudwatch_metrics": "true",
+      "sagemaker_program": "\"train.py\"",
+      "sagemaker_region": "\"eu-west-1\"",
+      "sagemaker_submit_directory": "\"<<<replace-with-your-training-source_dir-s3-path>>>\""
+    }
+  },
+  "validation": {
+    "log_group_name": "/aws/sagemaker/TrainingJobs",
+    "validation_metric": "final validation accuracy",
+    "validation_minimum_value": "85"
+  }
+}
