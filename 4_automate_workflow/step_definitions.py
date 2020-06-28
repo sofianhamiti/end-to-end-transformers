@@ -1,7 +1,5 @@
 import sagemaker
 from stepfunctions.steps.choice_rule import ChoiceRule
-from stepfunctions.steps.sagemaker import TrainingStep
-from stepfunctions.workflow import Workflow, cloudformation
 from stepfunctions.steps.states import Task, Choice, Catch, Chain, Fail, Succeed, Wait
 
 role = sagemaker.get_execution_role()
