@@ -3,15 +3,12 @@
     "name": "bert"
   },
   "data": {
-    "s3_bucket": "<<<REPLACE WITH YOUR BUCKET ID>>>",
+    "s3_bucket": "=== PLACE YOUR S3://BUCKET HERE ===",
     "initial_s3_data": "s3://aws-mlops-workshop/reviews/workshop_data/reviews.csv"
   },
   "processing": {
-    "container": "<<<REPLACE WITH YOUR CONTAINER ID>>>",
-    "instance_type": "ml.m5.xlarge",
-    "instance_count": 1,
-    "local_input_dir": "/opt/ml/processing/input",
-    "local_output_dir": "/opt/ml/processing/output"
+    "container": "=== PLACE YOUR CONTAINER ID HERE ===",
+    "instance_type": "ml.m5.xlarge"
   },
   "training": {
     "container": "763104351884.dkr.ecr.eu-west-1.amazonaws.com/pytorch-training:1.5.0-gpu-py3",
@@ -30,12 +27,7 @@
       "sagemaker_enable_cloudwatch_metrics": "true",
       "sagemaker_program": "\"train.py\"",
       "sagemaker_region": "\"eu-west-1\"",
-      "sagemaker_submit_directory": "\"<<<REPLACE WITH YOUR SOURCE_DIR.TAR.GZ S3 PATH>>>\""
+      "sagemaker_submit_directory": "\"=== PLACE YOUR S3://SOURCE_DIR.TAR.GZ FOR TRAINING HERE ===\""
     }
-  },
-  "validation": {
-    "log_group_name": "/aws/sagemaker/TrainingJobs",
-    "validation_metric": "final validation accuracy",
-    "validation_minimum_value": "85"
   }
 }

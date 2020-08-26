@@ -20,7 +20,7 @@ succeed = Succeed(
 # ========================================================
 initialise_execution = Task(
     state_id="InitialiseExecution",
-    resource="<<<REPLACE WITH YOUR CREATED LAMBDA ARN>>>",
+    resource="PLACE YOUR CREATE LAMBDA FUNCTION ARN HERE",
     parameters={
         "project.$": "$.project",
         "data.$": "$.data",
@@ -43,39 +43,41 @@ sagemaker_processing_job = Task(
     state_id="Prepare Data",
     resource="arn:aws:states:::sagemaker:createProcessingJob.sync",
     parameters={
-        "ProcessingJobName": "$.data.job_name",
+        "ProcessingJobName.$": "$.data.job_name",
         "AppSpecification": {
             "ContainerArguments": [
-                "--input=""$.processing.local_input_dir",
-                "--output=""$.processing.local_output_dir"
+                f"--input={input_folder}",
+                f"--output={output_folder}"
             ],
-            "ImageUri": "$.processing.container"
+            "ImageUri.$": "$.processing.container"
         },
         "ProcessingInputs": [ 
             {
                 "InputName": "input",
                 "S3Input": {
-                    "LocalPath": "$.processing.local_input_dir",
-                    "S3Uri": "$.data.processing_input"
+                    "LocalPath": input_folder,
+                    "S3Uri.$": "$.data.processing_input",
+                    "S3DataType": "S3Prefix",
+                    "S3InputMode": "File"
                 }
             }
         ],
         "ProcessingOutputConfig": {
-            "KmsKeyId": "string",
             "Outputs": [ 
                 {
                     "OutputName": "preprocessed",
                     "S3Output": {
-                        "LocalPath": "$.processing.local_output_dir",
-                        "S3Uri": "$.data.processing_output"
+                        "LocalPath": output_folder,
+                        "S3Uri.$": "$.data.processing_output",
+                        "S3UploadMode": "EndOfJob"
                     }
                 }
             ]
         },
         "ProcessingResources": {
             "ClusterConfig": {
-                "InstanceCount": "$.processing.instance_count",
-                "InstanceType": "$.processing.instance_type",
+                "InstanceCount": 1,
+                "InstanceType.$": "$.processing.instance_type",
                 "VolumeSizeInGB": 30
             }
         },
