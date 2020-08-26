@@ -3,11 +3,11 @@
     "name": "bert"
   },
   "data": {
-    "s3_bucket": "<<<replace-with-your-bucket-id>>>",
+    "s3_bucket": "<<<REPLACE WITH YOUR BUCKET ID>>>",
     "initial_s3_data": "s3://aws-mlops-workshop/reviews/workshop_data/reviews.csv"
   },
   "processing": {
-    "container": "<<<replace-with-your-container-id>>>",
+    "container": "<<<REPLACE WITH YOUR CONTAINER ID>>>",
     "instance_type": "ml.m5.xlarge",
     "instance_count": 1,
     "local_input_dir": "/opt/ml/processing/input",
@@ -30,7 +30,7 @@
       "sagemaker_enable_cloudwatch_metrics": "true",
       "sagemaker_program": "\"train.py\"",
       "sagemaker_region": "\"eu-west-1\"",
-      "sagemaker_submit_directory": "\"<<<replace-with-your-training-source_dir-s3-path>>>\""
+      "sagemaker_submit_directory": "\"<<<REPLACE WITH YOUR SOURCE_DIR.TAR.GZ S3 PATH>>>\""
     }
   },
   "validation": {

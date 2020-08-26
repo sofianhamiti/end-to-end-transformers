@@ -1,30 +1,26 @@
 import sagemaker
-from stepfunctions.steps.choice_rule import ChoiceRule
-from stepfunctions.steps.states import Task, Choice, Catch, Chain, Fail, Succeed, Wait
+from stepfunctions.steps.states import Task, Catch, Chain, Fail, Succeed
 
 role = sagemaker.get_execution_role()
+input_folder = '/opt/ml/processing/input'
+output_folder = '/opt/ml/processing/output'
 
 # ========================================================
 # ================== BUILT-IN BLOCKS =====================
 # ========================================================
-succeed = Succeed(
-    state_id="Succeed",
-)
-
 failed = Fail(
     state_id="Failed",
 )
 
-wait = Wait(
-    state_id="Wait",
-    seconds=60
+succeed = Succeed(
+    state_id="Succeed",
 )
 # ========================================================
-# =================== LAMBDA STEPS =======================
+# =================== LAMBDA STEP ========================
 # ========================================================
 initialise_execution = Task(
     state_id="InitialiseExecution",
-    resource="<<<replace-with-your-lambda-arn>>>",
+    resource="<<<REPLACE WITH YOUR CREATED LAMBDA ARN>>>",
     parameters={
         "project.$": "$.project",
         "data.$": "$.data",
@@ -40,24 +36,66 @@ initialise_execution.add_catch(
         result_path="$"
     )
 )
-
+# ========================================================
+# =============== SAGEMAKER PROCESSING JOB ===============
+# ========================================================
 sagemaker_processing_job = Task(
-    state_id="SageMakerProcessingJob",
-    resource="<<<replace-with-your-lambda-arn>>>",
+    state_id="Prepare Data",
+    resource="arn:aws:states:::sagemaker:createProcessingJob.sync",
+    parameters={
+        "ProcessingJobName": "$.data.job_name",
+        "AppSpecification": {
+            "ContainerArguments": [
+                "--input=""$.processing.local_input_dir",
+                "--output=""$.processing.local_output_dir"
+            ],
+            "ImageUri": "$.processing.container"
+        },
+        "ProcessingInputs": [ 
+            {
+                "InputName": "input",
+                "S3Input": {
+                    "LocalPath": "$.processing.local_input_dir",
+                    "S3Uri": "$.data.processing_input"
+                }
+            }
+        ],
+        "ProcessingOutputConfig": {
+            "KmsKeyId": "string",
+            "Outputs": [ 
+                {
+                    "OutputName": "preprocessed",
+                    "S3Output": {
+                        "LocalPath": "$.processing.local_output_dir",
+                        "S3Uri": "$.data.processing_output"
+                    }
+                }
+            ]
+        },
+        "ProcessingResources": {
+            "ClusterConfig": {
+                "InstanceCount": "$.processing.instance_count",
+                "InstanceType": "$.processing.instance_type",
+                "VolumeSizeInGB": 30
+            }
+        },
+        "RoleArn": role
+    },
     result_path="$.processing.processing_job"
 )
 
-
-get_processing_status = Task(
-    state_id="GetProcessingStatus",
-    resource="<<<replace-with-your-lambda-arn>>>",
-    result_path="$.processing.processing_job"
+sagemaker_processing_job.add_catch(
+    Catch(
+        error_equals=["States.ALL"],
+        next_step=failed,
+        result_path="$"
+    )
 )
 # ========================================================
 # ================ SAGEMAKER TRAINING JOB ================
 # ========================================================
 sagemaker_training_job = Task(
-    state_id="SageMakerTrainingJob",
+    state_id="Train Model",
     resource="arn:aws:states:::sagemaker:createTrainingJob.sync",
     parameters={
         "TrainingJobName.$": "$.data.job_name",
@@ -107,37 +145,11 @@ sagemaker_training_job = Task(
     },
     result_path="$.training"
 )
+
 sagemaker_training_job.add_catch(
     Catch(
         error_equals=["States.ALL"],
         next_step=failed,
         result_path="$"
     )
-)
-# ========================================================
-# ====== CHOSE NEXT STEP BASED ON PROCESSING STATUS ======
-# ========================================================
-is_processing_complete = Choice(
-    state_id="IsProcessingComplete"
-)
-is_processing_complete.add_choice(
-    ChoiceRule.StringEquals(
-        variable="$.processing.processing_job.ProcessingJobStatus",
-        value='InProgress'
-    ),
-    next_step=wait
-)
-is_processing_complete.add_choice(
-    ChoiceRule.StringEquals(
-        variable="$.processing.processing_job.ProcessingJobStatus",
-        value='Failed'
-    ),
-    next_step=failed
-)
-is_processing_complete.add_choice(
-    ChoiceRule.StringEquals(
-        variable="$.processing.processing_job.ProcessingJobStatus",
-        value='Completed'
-    ),
-    next_step=sagemaker_training_job
 )
