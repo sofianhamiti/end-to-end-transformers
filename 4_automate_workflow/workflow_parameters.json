@@ -4,7 +4,7 @@
   },
   "data": {
     "s3_bucket": "=== PLACE YOUR S3://BUCKET HERE ===",
-    "initial_s3_data": "s3://aws-mlops-workshop/reviews/workshop_data/reviews.csv"
+    "initial_s3_data": "=== PLACE YOUR S3 INPUT DATA HERE ==="
   },
   "processing": {
     "container": "=== PLACE YOUR CONTAINER ID HERE ===",
