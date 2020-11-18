@@ -44,3 +44,5 @@ docker tag ${image} ${fullname}
 
 echo "Pushing image to ECR ${fullname}"
 docker push ${fullname}
+
+echo "${fullname}" > ../ecr_image_name.txt
