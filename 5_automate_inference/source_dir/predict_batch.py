@@ -7,7 +7,6 @@ PRE_TRAINED_MODEL_NAME = 'bert-base-cased'
 CLASS_NAMES = ['negative', 'neutral', 'positive']
 
 class SentimentClassifier(nn.Module):
-
     def __init__(self, n_classes):
         super(SentimentClassifier, self).__init__()
         self.bert = BertModel.from_pretrained(PRE_TRAINED_MODEL_NAME)
@@ -20,7 +19,7 @@ class SentimentClassifier(nn.Module):
         return self.out(output)
 
 
-# defines the model
+# Defines the model
 def model_fn(model_dir):
     model_path = f'{model_dir}/best_model.bin'
     model = SentimentClassifier(len(CLASS_NAMES))
